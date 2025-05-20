@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestor de Tareas</title>
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+  <h1>Gestor de Tareas</h1>
+
+  <form id="formulario-tarea">
+    <label for="titulo">Título de la tarea:</label>
+    <input type="text" id="titulo" name="titulo" required>
+
+    <label for="fecha">Fecha de la tarea:</label>
+    <input type="date" id="fecha" name="fecha" required>
+
+    <label for="descripcion">Descripción:</label>
+    <textarea id="descripcion" name="descripcion" rows="4" required></textarea>
+
+    <button type="submit">Agregar tarea</button>
+  </form>
+
+  <h2>Lista de Tareas</h2>
+  <table id="tabla-tareas">
+    <thead>
+      <tr>
+        <th>Id</th>
+        <th>Título</th>
+        <th>Fecha</th>
+        <th>Descripción</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- En esta tabla se mostrarán las tareas agregadas -->
+    </tbody>
+  </table>
+
+  <script src="/js/script.js"></script>
+
+</body>
+</html>
+
