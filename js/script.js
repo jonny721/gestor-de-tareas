@@ -1,41 +1,81 @@
-// Obtener los datos del formulario por medio del boton crear
+// Obtener elementos del DOM
+const listForm = document.getElementById("list-form");
+const listInput = document.getElementById("list-input");
+const taskList = document.getElementById("task-list");
+const taskArea = document.getElementById("task-area");
+const toggleBtn = document.getElementById("toggle-sidebar");
+const container = document.querySelector(".container");
+const closeBtn = document.getElementById("close-sidebar");
 
-const formulario = document.getElementById("formulario-tarea");
+let isCollapsed = false;
 
-formulario.addEventListener("submit", function (event) {
-  event.preventDefault(); // Evitar el envío del formulario
-
-  const tarea = {
-    titulo: document.getElementById("titulo").value,
-    fecha: document.getElementById("fecha").value,
-    descripcion: document.getElementById("descripcion").value,
-  };  
-
-  // Obtener lista actual desde localStorage o crear una vacía si no hay nada
-
-  let tareas = JSON.parse(localStorage.getItem("tareas")) || [];
-
-  tareas.push(tarea);
-
-  // Guardar la lista actualizada en localStorage
-  localStorage.setItem("tareas", JSON.stringify(tareas));
-
-// Limpiar el formulario
-formulario.reset(); 
-
-  console.log("Tarea guardada:", tarea);
-  console.log("Lista actual de tareas:", tareas);
-
-
-  mostrarTareas();
+toggleBtn.addEventListener("click", () => {
+  isCollapsed = !isCollapsed;
+  container.classList.toggle("collapsed", isCollapsed);
 });
 
+closeBtn.addEventListener("click", () => {
+  isCollapsed = false;
+  container.classList.remove("collapsed");
+});
 
-function mostrarTareas() {
-  const tabla = document.querySelector("#tabla-tareas tbody");
-  tabla.innerHTML = ""; // Limpiar la tabla antes de mostrar las tareas
+// Objeto para rastrear las listas y sus IDs
+let lists = {};
 
-  let tareas = JSON.parse(localStorage.getItem("tareas")) || [];
+function createTaskManager(listId) {
+  // Crear el formulario y tabla para esta lista
+  taskArea.innerHTML = `
+    <form id="formulario-tarea-${listId}">
+      <label for="titulo-${listId}">Título de la tarea:</label>
+      <input type="text" id="titulo-${listId}" required>
+      <label for="fecha-${listId}">Fecha de la tarea:</label>
+      <input type="date" id="fecha-${listId}" required>
+      <label for="descripcion-${listId}">Descripción:</label>
+      <textarea id="descripcion-${listId}" required></textarea>
+      <button type="submit">Agregar tarea</button>
+    </form>
+    <h2>Lista de Tareas</h2>
+    <table id="tabla-tareas-${listId}">
+      <thead>
+        <tr>
+          <th>Id</th>
+          <th>Título</th>
+          <th>Fecha</th>
+          <th>Descripción</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  `;
+
+  // Inicializar o cargar tareas para esta lista
+  let tareas = JSON.parse(localStorage.getItem(`tareas_${listId}`)) || [];
+  lists[listId] = tareas;
+
+  // Manejar envío del formulario
+  const form = document.getElementById(`formulario-tarea-${listId}`);
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const tarea = {
+      titulo: document.getElementById(`titulo-${listId}`).value,
+      fecha: document.getElementById(`fecha-${listId}`).value,
+      descripcion: document.getElementById(`descripcion-${listId}`).value,
+    };
+    tareas.push(tarea);
+    localStorage.setItem(`tareas_${listId}`, JSON.stringify(tareas));
+    form.reset();
+    mostrarTareas(listId);
+  });
+
+  // Mostrar tareas iniciales
+  mostrarTareas(listId);
+}
+
+function mostrarTareas(listId) {
+  const tabla = document.querySelector(`#tabla-tareas-${listId} tbody`);
+  tabla.innerHTML = "";
+  let tareas = JSON.parse(localStorage.getItem(`tareas_${listId}`)) || [];
 
   tareas.forEach((tarea, index) => {
     const fila = document.createElement("tr");
@@ -50,31 +90,62 @@ function mostrarTareas() {
       </td>
     `;
     tabla.appendChild(fila);
-  });
 
-  // Botones "Completar"
-  const botonesCompletar = document.querySelectorAll(".btn-completar");
-  botonesCompletar.forEach(boton => {
-    boton.addEventListener("click", function () {
-      const fila = this.closest("tr");
+    // Botón Completar
+    fila.querySelector(".btn-completar").addEventListener("click", () => {
       fila.classList.toggle("completada");
     });
-  });
 
-  // Botones "Eliminar"
-  const botonesEliminar = document.querySelectorAll(".btn-eliminar");
-  botonesEliminar.forEach(boton => {
-    boton.addEventListener("click", function () {
-      const index = this.dataset.index;
-      let tareas = JSON.parse(localStorage.getItem("tareas")) || [];
-      // Elimina 1 elemento en la posición index
-      tareas.splice(index, 1); 
-      localStorage.setItem("tareas", JSON.stringify(tareas));
-      // Actualizar la tabla después de eliminar
-      mostrarTareas(); 
+    // Botón Eliminar
+    fila.querySelector(".btn-eliminar").addEventListener("click", () => {
+      tareas.splice(index, 1);
+      localStorage.setItem(`tareas_${listId}`, JSON.stringify(tareas));
+      mostrarTareas(listId);
     });
   });
 }
 
-mostrarTareas();
+// Manejar creación de lista
+listForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const listName = listInput.value.trim();
+  if (listName) {
+    const listId = Date.now().toString();
+    const li = document.createElement("li");
+    li.textContent = listName;
+    li.addEventListener("click", () => createTaskManager(listId));
+    taskList.appendChild(li);
+    // Eliminar lista (opcional, si quieres agregar un botón)
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "X";
+    deleteBtn.className = "btn-eliminar-lista";
+    deleteBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      Swal.fire({
+        title: "¿Estás seguro?",
+        text: `Se eliminará la lista "${listName}" y todas sus tareas.`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          localStorage.removeItem(`tareas_${listId}`);
+          li.remove();
+          taskArea.innerHTML = "";
 
+          Swal.fire({
+            title: "¡Eliminado!",
+            text: "La lista ha sido eliminada.",
+            icon: "success",
+            timer: 1500,
+            showConfirmButton: false,
+          });
+        }
+      });
+    });
+    li.appendChild(deleteBtn);
+
+    listInput.value = "";
+  }
+});

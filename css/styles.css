@@ -1,120 +1,304 @@
-/* 1. Estilos generales */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Inter', sans-serif;
   background-color: #f4f4f4;
   margin: 0;
+  padding: 0;
+}
+
+.container {
+  display: grid;
+  grid-template-areas:
+    "header"
+    "main"
+    "footer";
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: 1fr;
+  height: 100vh;
+}
+
+.header {
+  grid-area: header;
   padding: 20px;
-}
-
-/* 2. Títulos */
-h1, h2 {
-  text-align: center;
-  color: #333;
-}
-
-/* 3. Formulario */
-form {
-  background-color: #fff;
-  padding: 20px;
-  margin: 20px auto;
-  max-width: 500px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-form label {
-  display: block;
-  margin-top: 10px;
-  font-weight: bold;
-}
-
-form input,
-form textarea,
-form button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border-radius: 5px;
   border: 1px solid #ccc;
-  box-sizing: border-box;
 }
 
-form button {
-  background-color: #2d2d33;
+.main {
+  grid-area: main;
+  padding: 20px;
+  border: 1px solid #ccc;
+}
+
+.footer {
+  grid-area: footer;
+  background-color: #333;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+.sidebar {
+  background-color: beige;
+  padding: 10px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100%;
+  transform: translateX(-100%); /* Oculto por defecto en móviles */
+  transition: transform 0.3s ease;
+}
+
+#toggle-sidebar {
+  display: block; /* Visible en móviles */
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  padding: 10px;
+  margin-bottom: 10px;
+  background-color: #333;
   color: white;
   border: none;
+  border-radius: 5px;
   cursor: pointer;
-  margin-top: 15px;
-  font-size: 16px;
-  transition: background-color 0.3s;
+  z-index: 1000;
 }
 
-form button:hover {
-  background-color: #6d6d6d;
+#toggle-sidebar:hover {
+  background-color: #555;
 }
 
-/* 4. Tabla de tareas */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-  background-color: #fff;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+/* Estado colapsado (sidebar visible) */
+.collapsed .sidebar {
+  transform: translateX(0); /* Muestra el sidebar */
 }
 
-th, td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
+#close-sidebar {
+  display: none; /* Oculto por defecto */
+  position: fixed;
+  top: 10px;
+  right: 10px; /* Posición en la esquina superior derecha */
+  padding: 10px;
+  color: rgb(0, 0, 0);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  z-index: 1000;
 }
 
-th {
-  background-color: #2d2d33;
-  color: white;
+#close-sidebar:hover {
+  color: #777777; /* Cambio de color al pasar el mouse */
 }
 
-/* 5. Responsive */
+.collapsed #toggle-sidebar {
+  display: none; /* Oculta el botón de togglear cuando el sidebar está visible */
+}
+
+.collapsed #close-sidebar {
+  display: block; /* Muestra la "X" cuando el sidebar está visible */
+}
+
+  ul#task-list {
+    padding: 0;
+    margin: 0;
+    list-style-type: none;
+  }
+
+  #task-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+ #task-list li .btn-eliminar-lista {
+  display: none;
+  background-color: none;
+  border: none;
+ }
+
+#task-list li:hover .btn-eliminar-lista {
+    display: inline-block;
+  }
+
+  #task-list li:hover {
+    border-bottom: 1px solid #000000;
+  }
+
+/* ----------- ESTILOS PARA PANTALLAS GRANDES ---------- */
+@media (min-width: 600px) {
+  .container {
+    display: grid;
+    grid-template-areas:
+      "header header"
+      "sidebar main"
+      "footer footer";
+    grid-template-rows: auto 1fr auto;
+    grid-template-columns: auto 3fr; /* Sidebar: auto, Main: 3fr */
+    height: 100vh;
+  }
+  #toggle-sidebar {
+  display: none;
+}
+  .header {
+    grid-area: header;
+    padding: 20px;
+    border: 1px solid #ccc;
+  }
+
+  .sidebar {
+    grid-area: sidebar;
+    padding: 20px;
+    border: 1px solid #ccc;
+    background-color: beige;
+    height: 100%; /* Ocupa toda la altura del contenedor */
+    position: static; /* Quita el posicionamiento fijo para integrarlo al grid */
+    transform: none; /* Elimina la transformación de mobile */
+  }
+
+  .main {
+    grid-area: main;
+    padding: 20px;
+    border: 1px solid #ccc;
+  }
+
+  .footer {
+    grid-area: footer;
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+  }
+
+  #toggle-sidebar {
+    display: none; /* Oculto en pantallas grandes */
+  }
+
+  .altura {
+    padding: 5px;
+    margin: 10px 0;
+  }
+
+  .button {
+    padding: 5px;
+    color: #838383;
+    text-decoration: none;
+    border-radius: 5px;
+  }
+
+  #task-list li {
+    list-style: none;    
+    padding: 5px;
+    cursor: pointer;
+  }
+
+
+
+  /* Estilos del formulario y tabla */
+  #task-area form {
+    background-color: #fff;
+    padding: 20px;
+    margin: 0 0 20px 0;
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+
+  #task-area form label {
+    display: block;
+    margin-top: 10px;
+    font-weight: bold;
+  }
+
+  #task-area form input,
+  #task-area form textarea,
+  #task-area form button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
+
+  #task-area form button {
+    background-color: #2d2d33;
+    color: white;
+    border: none;
+    cursor: pointer;
+    margin-top: 15px;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+
+  #task-area form button:hover {
+    background-color: #6d6d6d;
+  }
+
+  #task-area table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: #fff;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  }
+
+  #task-area th,
+  #task-area td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  #task-area th {
+    background-color: #2d2d33;
+    color: white;
+  }
+
+  #task-area .completada {
+    background-color: #969696;
+    text-decoration: line-through;
+    color: rgb(0, 0, 0);
+    opacity: 0.7;
+  }
+
+  #task-area .btn {
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 12px;
+    margin: 4px 2px;
+    cursor: pointer;
+  }
+
+  #task-area .btn-success {
+    background-color: #4CAF50;
+    color: white;
+  }
+
+  #task-area .btn-danger {
+    background-color: #f44336;
+    color: white;
+  }
+}
+
+
+/*
 @media (max-width: 600px) {
-  form, table {
+  #task-area form, #task-area table {
     width: 100%;
     margin: 0;
     padding: 10px;
   }
 
-  th, td {
+  #task-area th, #task-area td {
     font-size: 14px;
     padding: 8px;
   }
 
-  form button {
+  #task-area form button {
     font-size: 14px;
   }
-}
-.completada {
-  background-color: #969696; /* verde suave */
-  text-decoration: line-through;
-  color: rgb(0, 0, 0);
-  opacity: 0.7;
-}
-
-.btn{  
-  border: none;
-  padding: 8px 16px;
-  border-radius: 5px;
-  text-align: center;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 12px;
-  margin: 4px 2px;
-  cursor: pointer;
-}
-
-.btn-success {
-  background-color: #4CAF50; /* Verde */
-  color: white;
-}
-
-.btn-danger {
-  background-color: #f44336; /* Rojo */
-  color: white;
 }
